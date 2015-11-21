@@ -261,6 +261,12 @@ feature -- Status report
 			end
 		end
 
+	is_zero: BOOLEAN
+			-- Is `Current' zero?
+		do
+			Result := (Current ~ zero)
+		end
+
 	is_odd: BOOLEAN
 			-- Is `Current' an odd number?
 		do
