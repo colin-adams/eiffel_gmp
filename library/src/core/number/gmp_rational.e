@@ -56,6 +56,7 @@ create
 	make_integer_32_2,
 	make_gmp_float,
 	make_gmp_integer,
+	make_gmp_integer_2,
 	make_natural_32,
 	make_natural_32_2,
 	make_real_64,
@@ -90,6 +91,16 @@ feature {NONE}
 		do
 			default_create
 			set_gmp_integer (v)
+		end
+
+	make_gmp_integer_2 (u, v: GMP_INTEGER)
+			-- Initialize as `u'/`v'.
+		require
+			v_not_zero: not v.is_zero
+		do
+			default_create
+			set_numerator (u)
+			set_denominator (v)
 		end
 
 	make_natural_32 (v: NATURAL_32)
@@ -273,10 +284,10 @@ feature -- Setting
 	set_integer (v: INTEGER_32)
 			-- Set `Current' to `v'/1.
 		do
-			{MPQ_FUNCTIONS}.mpq_set_si (item, v, 1)
+			{MPQ_FUNCTIONS}.mpq_set_si (item, v, {NATURAL_32} 1)
 			{MPQ_FUNCTIONS}.mpq_canonicalize (item) -- hm. this should be unnecessary - comment out when test suite available.
 		ensure
-			denominator_one: denominator ~ One
+			denominator_one: denominator ~ one.numerator
 		end
 
 	set_integer_2 (v1: INTEGER_32; v2: NATURAL_32)
