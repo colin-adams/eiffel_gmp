@@ -3,8 +3,8 @@ note
 	description: "Floating point numbers"
 
 	author: "Chris Saunders; Colin Adams"
-	date: "$Date: 2010-06-03 (Thurs, 03 June 2010) $"
-	revision: "$Revision: 1.0.0.0 $"
+	date: "$Date: $"
+	revision: "$Revision:  $"
 
 class GMP_FLOAT
 
