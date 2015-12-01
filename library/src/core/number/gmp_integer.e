@@ -9,7 +9,7 @@ note
 class GMP_INTEGER
 
 inherit
-	
+
 	COMPARABLE
 		undefine
 			default_create
@@ -71,8 +71,10 @@ feature {NONE} -- Initialization
 			set_integer_32 (v)
 		end
 
-	make_gmp_float (v: GMP_FLOAT) 
+	make_gmp_float (v: GMP_FLOAT)
 			-- Initialize from `v'.
+		require
+			v_attached: v /= Void
 		do
 			default_create
 			set_gmp_float (v)
@@ -80,6 +82,8 @@ feature {NONE} -- Initialization
 
 	make_gmp_rational (v: GMP_RATIONAL)
 			-- Initialize from truncation of `v' to an integer.
+		require
+			v_attached: v /= Void
 		do
 			default_create
 			set_gmp_rational (v)
@@ -104,7 +108,8 @@ feature {NONE} -- Initialization
 			-- Initialize from `v'.
 			-- `v' is assumed to be a decimal string.
 		require
-			is_decimal_integer_string: is_decimal_integer_string (v)
+			v_attached: v /= Void
+			v_is_decimal_integer_string: is_decimal_integer_string (v)
 		do
 			default_create
 			set_string (v)
@@ -114,7 +119,8 @@ feature {NONE} -- Initialization
 			-- Initialize from `v'.
 			-- `v' is assumed to be a binary format string.
 		require
-			is_binary_integer_string: is_binary_integer_string (v)
+			v_attached: v /= Void
+			v_is_binary_integer_string: is_binary_integer_string (v)
 		do
 			default_create
 			set_binary_string (v)
@@ -124,7 +130,8 @@ feature {NONE} -- Initialization
 			-- Initialize from `v'.
 			-- `v' is assumed to be a hexadecimal format string.
 		require
-			is_hex_integer_string: is_hex_integer_string (v)
+			v_attached: v /= Void
+			v_is_hex_integer_string: is_hex_integer_string (v)
 		do
 			default_create
 			set_hex_string (v)
@@ -192,72 +199,84 @@ feature -- Status report
 
 	is_binary_integer_string (v: STRING): BOOLEAN
 			-- Is `v' a string that can represent a binary integer?
+		require
+			v_attached: v /= Void
 		local
 			i, l_count: INTEGER
 			c: CHARACTER
 			l_str: STRING
 		do
-			if v.item (1) = '-' or else v.item (1) = '+' then
-				l_str := v.substring (2, v.count)
-			else
-				l_str := v
-			end
-			from
-				i := 1
-				Result := True
-				l_count := l_str.count
-			until
-				(not Result) or else (i > l_count)
-			loop
-				c := l_str.item (i)
-				Result := c = '0' or else c = '1'
-				i := i + 1
+			if not v.is_empty then
+				if v.item (1) = '-' or else v.item (1) = '+' then
+					l_str := v.substring (2, v.count)
+				else
+					l_str := v
+				end
+				from
+					i := 1
+					Result := True
+					l_count := l_str.count
+				until
+					(not Result) or else (i > l_count)
+				loop
+					c := l_str.item (i)
+					Result := c = '0' or else c = '1'
+					i := i + 1
+				end
 			end
 		end
 
 	is_decimal_integer_string (v: STRING): BOOLEAN
 			-- Is `v' a string that can represent a decimal integer?
+		require
+			v_attached: v /= Void
 		local
 			i, l_count: INTEGER
 			l_str: STRING
 		do
-			if v.item (1) = '-' or else v.item (1) = '+' then
-				l_str := v.substring (2, v.count)
-			else
-				l_str := v
-			end
-			from
-				i := 1
-				Result := True
-				l_count := l_str.count
-			until
-				(not Result) or else (i > l_count)
-			loop
-				Result := l_str.item (i).is_digit
-				i := i + 1
+			if not v.is_empty then
+				if v.item (1) = '-' or else v.item (1) = '+' then
+					l_str := v.substring (2, v.count)
+				else
+					l_str := v
+				end
+				from
+					i := 1
+					Result := True
+					l_count := l_str.count
+				until
+					(not Result) or else (i > l_count)
+				loop
+					Result := l_str.item (i).is_digit
+					i := i + 1
+				end
 			end
 		end
 
 	is_hex_integer_string (v: STRING): BOOLEAN
 			-- Is `v' a string that can represent a hexadecimal integer?
+		require
+			v_attached: v /= Void
 		local
 			i, l_count: INTEGER
 			l_str: STRING
 		do
-			if v.item (1) = '-' or else v.item (1) = '+' then
-				l_str := v.substring (2, v.count)
-			else
-				l_str := v
-			end
-			from
-				i := 1
-				Result := True
-				l_count := l_str.count
-			until
-				(not Result) or else (i > l_count)
-			loop
-				Result := l_str.item (i).is_hexa_digit
-				i := i + 1
+			if not v.is_empty then
+				if v.item (1) = '-' or else v.item (1) = '+' then
+					l_str := v.substring (2, v.count)
+				else
+					l_str := v
+				end
+				from
+					i := 1
+					Result := True
+					l_count := l_str.count
+				until
+					(not Result) or else (i > l_count)
+				loop
+					Result := l_str.item (i).is_hexa_digit
+					i := i + 1
+				end
 			end
 		end
 
@@ -313,12 +332,16 @@ feature -- Element change
 
 	set_gmp_float (v: GMP_FLOAT)
 			-- Set `Current' from `v'.
+		require
+			v_attached: v /= Void
 		do
 			{MPZ_FUNCTIONS}.mpz_set_f (item, v.item)
 		end
 
 	set_gmp_rational (v: GMP_RATIONAL)
 			-- Set `Current' from truncation of `v' to an integer.
+		require
+			v_attached: v /= Void
 		do
 			{MPZ_FUNCTIONS}.mpz_set_q (item, v.item)
 		end
@@ -340,7 +363,8 @@ feature -- Element change
 			-- Set `Current' from `v'.
 			-- `v' is assumed to be a decimal string.
 		require
-			is_decimal_integer_string: is_decimal_integer_string (v)
+			v_attached: v /= Void
+			v_is_decimal_integer_string: is_decimal_integer_string (v)
 		do
 			set_string_successful := {MPZ_FUNCTIONS}.mpz_set_str (item, (create {C_STRING}.make (v)).item, Decimal) = 0
 		ensure
@@ -351,7 +375,8 @@ feature -- Element change
 			-- Set `Current' from `v'.
 			-- `v' is assumed to be a binary format string.
 		require
-			is_binary_integer_string: is_binary_integer_string (v)
+			v_attached: v /= Void
+			v_is_binary_integer_string: is_binary_integer_string (v)
 		do
 			set_string_successful := {MPZ_FUNCTIONS}.mpz_set_str (item, (create {C_STRING}.make (v)).item, Binary) = 0
 		ensure
@@ -362,7 +387,8 @@ feature -- Element change
 			-- Set `Current' from `v'.
 			-- `v' is assumed to be a hexadecimal format string.
 		require
-			is_hex_integer_string: is_hex_integer_string (v)
+			v_attached: v /= Void
+			v_is_hex_integer_string: is_hex_integer_string (v)
 		do
 			set_string_successful := {MPZ_FUNCTIONS}.mpz_set_str (item, (create {C_STRING}.make (v)).item, Hexadecimal) = 0
 		ensure
@@ -403,24 +429,32 @@ feature -- Conversion
 			-- Conversion to a binary string
 		do
 			Result := (create {C_STRING}.make_by_pointer ({MPZ_FUNCTIONS}.mpz_get_str (default_pointer, Binary, item))).string
+		ensure
+			to_binary_string_attached: Result /= Void
 		end
 
 	to_hex_string: STRING
 			-- Conversion to a binary string
 		do
 			Result := (create {C_STRING}.make_by_pointer ({MPZ_FUNCTIONS}.mpz_get_str (default_pointer, Hexadecimal, item))).string
+		ensure
+			to_hex_string_attached: Result /= Void
 		end
 
 	to_gmp_float: GMP_FLOAT
 			-- Conversion to a real number
 		do
 			create Result.make_gmp_integer (Current)
+		ensure
+			to_gmp_float_attached: Result /= Void
 		end
 
 	to_gmp_rational: GMP_RATIONAL
 			-- Conversion to a rational number
 		do
 			create Result.make_gmp_integer (Current)
+		ensure
+			to_gmp_rational_attached: Result /= Void
 		end
 
 	to_real_64: REAL_64
@@ -484,6 +518,7 @@ feature -- Basic operations
 	integer_remainder alias "\\" (a_other: like Current): like Current
 			-- Remainder of integer division of Current by `a_other'
 		require
+			a_other_attached: a_other /= Void
 			good_divisor: divisible (a_other)
 		do
 			create Result
@@ -493,6 +528,7 @@ feature -- Basic operations
 	quotient alias "/" (a_other: like Current): GMP_FLOAT
 			-- Division by `a_other'
 		require
+			a_other_attached: a_other /= Void
 			good_divisor: divisible (a_other)
 		local
 			l_mpf_current, l_mpf_other: GMP_FLOAT
@@ -521,23 +557,35 @@ feature -- Bit operations
 
 	bit_and alias "&" (a_other: like Current): like Current
 			-- Bitwise and between `Current' and `a_other'
+		require
+			a_other_attached: a_other /= Void
 		do
 			create Result
 			{MPZ_FUNCTIONS}.mpz_and (Result.item, item, a_other.item)
+		ensure
+			bit_and_attached: Result /= Void
 		end
 
 	bit_or alias "|" (a_other: like Current): like Current
 			-- Bitwise or between `Current' and `a_other'
+		require
+			a_other_attached: a_other /= Void
 		do
 			create Result
 			{MPZ_FUNCTIONS}.mpz_ior (Result.item, item, a_other.item)
+		ensure
+			bit_or_attached: Result /= Void
 		end
 
 	bit_xor (a_other: like Current): like Current
 			-- Bitwise xor between `Current' and `a_other'
+		require
+			a_other_attached: a_other /= Void
 		do
 			create Result
 			{MPZ_FUNCTIONS}.mpz_xor (Result.item, item, a_other.item)
+		ensure
+			bit_xor_attached: Result /= Void
 		end
 
 	bit_not: like Current
@@ -545,6 +593,8 @@ feature -- Bit operations
 		do
 			create Result
 			{MPZ_FUNCTIONS}.mpz_com (Result.item, item)
+		ensure
+			bit_not_attached: Result /= Void
 		end
 
 	bit_shift (n: INTEGER): like Current
@@ -556,6 +606,8 @@ feature -- Bit operations
 			else
 				Result := bit_shift_left (-n)
 			end
+		ensure
+			bit_shift_attached: Result /= Void
 		end
 
 	bit_shift_left alias "|<<" (n: INTEGER): like Current
@@ -563,6 +615,8 @@ feature -- Bit operations
 		do
 			create Result
 			{MPZ_FUNCTIONS}.mpz_mul_2exp (Result.item, item, n.to_natural_32)
+		ensure
+			bit_shift_left_attached: Result /= Void
 		end
 
 	bit_shift_right alias "|>>" (n: INTEGER): like Current
@@ -570,6 +624,8 @@ feature -- Bit operations
 		do
 			create Result
 			{MPZ_FUNCTIONS}.mpz_tdiv_q_2exp (Result.item, item, n.to_natural_32)
+		ensure
+			bit_right_attached: Result /= Void
 		end
 
 	bit_test (n: INTEGER): BOOLEAN
@@ -589,11 +645,15 @@ feature -- Bit operations
 			else
 				{MPZ_FUNCTIONS}.mpz_clrbit (Result.item, n.to_natural_32)
 			end
+		ensure
+			bit_set_attached: Result /= Void
 		end
 
 	bit_set_with_mask (b: BOOLEAN; m: like Current): like Current
 			-- Copy of `Current' with all 1 bits of `m' set to 1
 			-- if `b', 0 otherwise
+		require
+			m_attached: m /= Void
 		local
 			l_m_not: like Current
 		do
@@ -605,6 +665,8 @@ feature -- Bit operations
 				{MPZ_FUNCTIONS}.mpz_com (l_m_not.item, m.item)
 				{MPZ_FUNCTIONS}.mpz_and (Result.item, item, l_m_not.item)
 			end
+		ensure
+			bit_set_with_mask_attached: Result /= Void
 		end
 
 feature -- Output
