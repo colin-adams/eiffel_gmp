@@ -74,13 +74,17 @@ feature {NONE}
 
 	make_integer_32_2 (v1: INTEGER_32; v2: NATURAL_32)
 			-- Initialize as `v1'/'v2' reduced to canonical form.
+		require
+			v2_not_zero: v2 /~ 0
 		do
 			default_create
 			set_integer_2 (v1, v2)
 		end
 
 	make_gmp_float (v: GMP_FLOAT)
-			-- Initialize as exact value of `v'.	
+			-- Initialize as exact value of `v'.
+		require
+			v_attached: v /= Void
 		do
 			default_create
 			set_gmp_float (v)
@@ -88,6 +92,8 @@ feature {NONE}
 
 	make_gmp_integer (v: GMP_INTEGER)
 			-- Initialize as `v'/1.
+		require
+			v_attached: v /= Void	
 		do
 			default_create
 			set_gmp_integer (v)
@@ -96,6 +102,8 @@ feature {NONE}
 	make_gmp_integer_2 (u, v: GMP_INTEGER)
 			-- Initialize as `u'/`v'.
 		require
+			v_attached: v /= Void
+			u_attached: u /= Void
 			v_not_zero: not v.is_zero
 		do
 			default_create
@@ -112,6 +120,8 @@ feature {NONE}
 
 	make_natural_32_2 (v1, v2: NATURAL_32)
 			-- Initialize as `v1'/`v2'.
+		require
+			v2_not_zero: v2 /~ 0	
 		do
 			default_create
 			set_natural_2 (v1, v2)
@@ -127,7 +137,8 @@ feature {NONE}
 	make_string (v: STRING_8)
 			-- Initialize from `v' interpreted as a rational number.
 		require
-			is_decimal_rational_string: is_decimal_rational_string (v)
+			v_attached: v /= Void
+			v_is_decimal_rational_string: is_decimal_rational_string (v)
 		do
 			default_create
 			set_string (v)
@@ -140,6 +151,8 @@ feature -- Access
 		do
 			create Result
 			{MPQ_FUNCTIONS}.mpq_get_num (Result.item, item)
+		ensure
+			numerator_attached: Result /= Void
 		end
 
 	denominator: GMP_INTEGER assign set_denominator
@@ -147,6 +160,8 @@ feature -- Access
 		do
 			create Result
 			{MPQ_FUNCTIONS}.mpq_get_den (Result.item, item)
+		ensure
+			denominator_attached: Result /= Void
 		end
 
 	sign: INTEGER_32
@@ -185,57 +200,61 @@ feature -- Status report
 
 	is_decimal_rational_string (v: STRING_8): BOOLEAN
 			-- Is `v' in a suitable format for `set_string' or `make_string'?
+		require
+			v_attached: v /= Void
 		local
 			c: CHARACTER_8
 			i, l_divide_symbol_index: INTEGER_32
 			l_str_num, l_str_den: STRING_8
 		do
-			l_divide_symbol_index := v.index_of ('/', 1)
-			if l_divide_symbol_index = 0 then
-				l_str_num := v
-				c := l_str_num.item (1)
-				if c = '-' or else c = '+' then
-					l_str_num := l_str_num.substring (2, l_str_num.count)
-				end
-				l_str_num.prune_all (' ')
-				from
-					i := 1
-					Result := True
-				until
-					(not Result) or else (i > l_str_num.count)
-				loop
-					Result := l_str_num.item (i).is_digit
-					i := i + 1
-				end
-			else
-				l_str_num := v.substring (1, l_divide_symbol_index - 1)
-				c := l_str_num.item (1)
-				if c = '-' or else c = '+' then
-					l_str_num := l_str_num.substring (2, l_divide_symbol_index - 1)
-				end
-				l_str_num.prune_all (' ')
-				from
-					i := 1
-					Result := True
-				until
-					(not Result) or else (i > l_str_num.count)
-				loop
-					Result := l_str_num.item (i).is_digit
-					i := i + 1
-				end
-				l_str_den := v.substring (l_divide_symbol_index + 1, v.count)
-				c := l_str_den.item (1)
-				if c = '-' or else c = '+' then
-					l_str_den := l_str_den.substring (2, l_str_den.count)
-				end
-				l_str_den.prune_all (' ')
-				from
-					i := 1
-				until
-					(not Result) or else (i > l_str_den.count)
-				loop
-					Result := l_str_den.item (i).is_digit
-					i := i + 1
+			if not v.is_empty then
+				l_divide_symbol_index := v.index_of ('/', 1)
+				if l_divide_symbol_index = 0 then
+					l_str_num := v
+					c := l_str_num.item (1)
+					if c = '-' or else c = '+' then
+						l_str_num := l_str_num.substring (2, l_str_num.count)
+					end
+					l_str_num.prune_all (' ')
+					from
+						i := 1
+						Result := True
+					until
+						(not Result) or else (i > l_str_num.count)
+					loop
+						Result := l_str_num.item (i).is_digit
+						i := i + 1
+					end
+				else
+					l_str_num := v.substring (1, l_divide_symbol_index - 1)
+					c := l_str_num.item (1)
+					if c = '-' or else c = '+' then
+						l_str_num := l_str_num.substring (2, l_divide_symbol_index - 1)
+					end
+					l_str_num.prune_all (' ')
+					from
+						i := 1
+						Result := True
+					until
+						(not Result) or else (i > l_str_num.count)
+					loop
+						Result := l_str_num.item (i).is_digit
+						i := i + 1
+					end
+					l_str_den := v.substring (l_divide_symbol_index + 1, v.count)
+					c := l_str_den.item (1)
+					if c = '-' or else c = '+' then
+						l_str_den := l_str_den.substring (2, l_str_den.count)
+					end
+					l_str_den.prune_all (' ')
+					from
+						i := 1
+					until
+						(not Result) or else (i > l_str_den.count)
+					loop
+						Result := l_str_den.item (i).is_digit
+						i := i + 1
+					end
 				end
 			end
 		end
@@ -269,6 +288,8 @@ feature -- Setting
 
 	set_numerator (v: GMP_INTEGER)
 			-- Set `numerator' to `v' then canonicalize.
+		require
+			v_attached: v /= Void
 		do
 			{MPQ_FUNCTIONS}.mpq_set_num (item, v.item)
 			{MPQ_FUNCTIONS}.mpq_canonicalize (item)
@@ -276,6 +297,9 @@ feature -- Setting
 
 	set_denominator (v: GMP_INTEGER)
 			-- Set `denominator' to `v' then canonicalize.
+		require
+			v_attached: v /= Void
+			v_not_zero: not v.is_zero
 		do
 			{MPQ_FUNCTIONS}.mpq_set_den (item, v.item)
 			{MPQ_FUNCTIONS}.mpq_canonicalize (item)
@@ -283,15 +307,20 @@ feature -- Setting
 
 	set_integer (v: INTEGER_32)
 			-- Set `Current' to `v'/1.
+		require
+			v_attached: v /= Void
 		do
 			{MPQ_FUNCTIONS}.mpq_set_si (item, v, {NATURAL_32} 1)
-			{MPQ_FUNCTIONS}.mpq_canonicalize (item) -- hm. this should be unnecessary - comment out when test suite available.
+			-- {MPQ_FUNCTIONS}.mpq_canonicalize (item) -- hm. this should be unnecessary - comment out when test suite available.
 		ensure
 			denominator_one: denominator ~ one.numerator
 		end
 
 	set_integer_2 (v1: INTEGER_32; v2: NATURAL_32)
-			-- Set `Current' to value of `v1'/`v2' reduced to canonical form.
+			-- Set `Current' to value of `v1'/`v2' reduced to canonical 
+			-- form.
+		require
+			v2_not_zero: v2 /~ 0
 		do
 			{MPQ_FUNCTIONS}.mpq_set_si (item, v1, v2)
 			{MPQ_FUNCTIONS}.mpq_canonicalize (item)
@@ -299,12 +328,16 @@ feature -- Setting
 
 	set_gmp_float (v: GMP_FLOAT)
 			-- Set `Current' to exact value of `v'.
+		require
+			v_attached: v /= Void	
 		do
 			{MPQ_FUNCTIONS}.mpq_set_f (item, v.item)
 		end
 
 	set_gmp_integer (v: GMP_INTEGER)
 			-- Set `Current' to `v'/1.
+		require
+			v_attached: v /= Void	
 		do
 			{MPQ_FUNCTIONS}.mpq_set_z (item, v.item)
 		ensure
@@ -321,6 +354,8 @@ feature -- Setting
 	set_natural_2 (v1, v2: NATURAL_32)
 			-- Set `Current' to value of `v1'/`v2' reduced to canonical 
 			-- form.
+		require
+			v2_not_zero: v2 /~ 0
 		do
 			{MPQ_FUNCTIONS}.mpq_set_ui (item, v1, v2)
 			{MPQ_FUNCTIONS}.mpq_canonicalize (item)
@@ -335,7 +370,8 @@ feature -- Setting
 	set_string (v: STRING_8)
 			-- Set `Current' to `v' interpreted as a rational number.
 		require
-			is_decimal_rational_string: is_decimal_rational_string (v)
+			v_attached: v /= Void		
+			v_is_decimal_rational_string: is_decimal_rational_string (v)
 		do
 			set_string_successful := {MPQ_FUNCTIONS}.mpq_set_str (item, (create {C_STRING}.make (v)).item, Decimal) = 0
 			{MPQ_FUNCTIONS}.mpq_canonicalize (item)
@@ -349,24 +385,32 @@ feature
 			-- Truncation of `Current' to an integer
 		do
 			create Result.make_gmp_rational (Current)
+		ensure
+			as_gmp_integer_attached: Result /= Void
 		end
 
 	to_binary_string: STRING_8
 			-- Representation of `Current' as the ratio of two binary substrings
 		do
 			Result := numerator.to_binary_string + " / " + denominator.to_binary_string
+		ensure
+			to_binary_string_attached: Result /= Void
 		end
 
 	to_hex_string: STRING_8
 			-- Representation of `Current' as the ratio of two hexadecimal substrings
 		do
 			Result := numerator.to_hex_string + " / " + denominator.to_hex_string
+		ensure
+			to_hex_string_attached: Result /= Void
 		end
 
 	to_gmp_float: GMP_FLOAT
 			-- `Current' as a floating point number
 		do
 			create Result.make_gmp_rational (Current)
+		ensure
+			to_gmp_float_attached: Result /= Void
 		end
 
 	to_gmp_integer: GMP_INTEGER
@@ -375,6 +419,8 @@ feature
 			is_integer: is_integer
 		do
 			Result := as_gmp_integer
+		ensure
+			to_gmp_integer_attached: Result /= Void
 		end
 
 	to_real_64: REAL_64

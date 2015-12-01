@@ -79,6 +79,8 @@ feature {NONE} -- Initialization
 	make_integer_32_with_precision (v: INTEGER_32; prec: NATURAL_32)
 			-- Initialize from `v'.
 			-- `precision' will be >= `prec'.
+		require
+			v_attached: v /= Void
 		do
 			make_precision (prec)
 			set_integer_32 (v)
@@ -87,6 +89,8 @@ feature {NONE} -- Initialization
 	make_gmp_rational (v: GMP_RATIONAL)
 			-- Initialize from `v'.
 			-- `precision' will be the default precision.
+		require
+			v_attached: v /= Void	
 		do
 			default_create
 			set_gmp_rational (v)
@@ -95,6 +99,8 @@ feature {NONE} -- Initialization
 	make_gmp_rational_with_precision (v: GMP_RATIONAL; prec: NATURAL_32)
 			-- Initialize from `v'.
 			-- `precision' will be >= `prec'.
+		require
+			v_attached: v /= Void
 		do
 			make_precision (prec)
 			{MPF_FUNCTIONS}.mpf_set_q (item, v.item)
@@ -103,6 +109,8 @@ feature {NONE} -- Initialization
 	make_gmp_integer (v: GMP_INTEGER)
 			-- Initialize from `v'.
 			-- `precision' will be the default precision.
+		require
+			v_attached: v /= Void
 		do
 			default_create
 			set_gmp_integer (v)
@@ -111,6 +119,8 @@ feature {NONE} -- Initialization
 	make_gmp_integer_with_precision (v: GMP_INTEGER; prec: NATURAL_32)
 			-- Initialize from `v'.
 			-- `precision' will be >= `prec'.
+		require
+			v_attached: v /= Void
 		do
 			make_precision (prec)
 			{MPF_FUNCTIONS}.mpf_set_z (item, v.item)
@@ -150,8 +160,10 @@ feature {NONE} -- Initialization
 
 	make_string (v: STRING)
 			-- Initialize from `v'.
-			-- `v' is assumed to be a decimal string.
 			-- `precision' will be set to a reasonable value.
+		require
+			v_attached: v /= Void
+			v_is_decimal: is_decimal_string (v)
 		do
 			default_create
 			set_string (v)
@@ -165,6 +177,9 @@ feature {NONE} -- Initialization
 	make_string_with_precision (v: STRING; prec: NATURAL_32)
 			-- Initialize from `v'.
 			-- `precision' will be >= `prec'.
+		require
+			v_attached: v /= Void
+			v_is_decimal: is_decimal_string (v)
 		local
 			str: STRING
 		do
@@ -202,6 +217,8 @@ feature -- Access
 			else
 				create Result
 			end
+		ensure
+			fraction_attached: fraction /= Void
 		end
 
 	sign: INTEGER_32
@@ -259,6 +276,33 @@ feature -- Status report
 			Result := {MPF_FUNCTIONS}.mpf_integer_p (item) /= 0
 		end
 
+	is_decimal_string (v: STRING): BOOLEAN
+			-- Is `v' a string that can represent a decimal_number?
+		require
+			v_attached: v /= Void
+		local
+			i, l_count: INTEGER
+			l_str: STRING
+		do
+			if not v.is_empty then
+				if v.item (1) = '-' or else v.item (1) = '+' then
+					l_str := v.substring (2, v.count)
+				else
+					l_str := v
+				end
+				from
+					i := 1
+					Result := True
+					l_count := l_str.count
+				until
+					(not Result) or else (i > l_count)
+				loop
+					Result := l_str.item (i).is_digit or l_str.item (i) ~ '.'
+					i := i + 1
+				end
+			end
+		end
+
 	set_string_successful: BOOLEAN
 			-- Was the last call to `set_string' successful?
 
@@ -287,6 +331,8 @@ feature -- Element change
 
 	set_gmp_rational (v: GMP_RATIONAL)
 			-- Set from `v'.
+		require
+			v_attached: v /= Void
 		do
 			set_precision (v.precision.max ({PLATFORM}.real_64_bits.to_natural_32))
 			{MPF_FUNCTIONS}.mpf_set_q (item, v.item)
@@ -294,6 +340,8 @@ feature -- Element change
 
 	set_gmp_integer (v: GMP_INTEGER)
 			-- Set from `v'.
+		require
+			v_attached: v /= Void	
 		do
 			set_precision (v.precision.max ({PLATFORM}.real_64_bits.to_natural_32))
 			{MPF_FUNCTIONS}.mpf_set_z (item, v.item)
@@ -313,8 +361,9 @@ feature -- Element change
 
 	set_string (v: STRING)
 			-- Set from `v'.
-			-- `v' is assumed to be a decimal string.
-			-- TODO - add the assumption as a precondition.
+		require
+			v_attached: v /= Void
+			v_is_decimal: is_decimal_string (v)
 		local
 			l_str: STRING
 		do
@@ -323,7 +372,7 @@ feature -- Element change
 			if l_str.has ('.') then
 				l_str.prune_all_trailing ('0')
 			end
-			if l_str ~ "." then
+			if l_str ~ "." or l_str.is_empty then
 				l_str := "0.0"
 			end
 			set_precision ((l_str.count * ({DOUBLE_MATH}.log (10) / {DOUBLE_MATH}.log (2)).ceiling).to_natural_32)
@@ -361,6 +410,8 @@ feature -- Conversion
 			-- Conversion to a GMP_INTEGER
 		do
 			create Result.make_gmp_float (Current)
+		ensure
+			as_gmp_integer_attached: Result /= Void
 		end
 
 	ceiling: GMP_FLOAT
@@ -369,6 +420,7 @@ feature -- Conversion
 			create Result.make_precision (precision)
 			{MPF_FUNCTIONS}.mpf_ceil (Result.item, item)
 		ensure
+			ceiling_attached: Result /= Void
 			result_no_smaller: Result >= Current
 			close_enough: Result - Current < one
 		end
@@ -379,6 +431,7 @@ feature -- Conversion
 			create Result.make_precision (precision)
 			{MPF_FUNCTIONS}.mpf_floor (Result.item, item)
 		ensure
+			float_attached: Result /= Void
 			result_no_greater: Result <= Current
 			close_enough: Current - Result < one
 		end
@@ -395,6 +448,8 @@ feature -- Conversion
 			-- Conversion to a GMP_RATIONAL
 		do
 			create Result.make_gmp_float (Current)
+		ensure
+			to_gmp_rational_attached: Result /= Void
 		end
 
 	to_gmp_integer: GMP_INTEGER
@@ -403,6 +458,8 @@ feature -- Conversion
 			is_integer: is_integer
 		do
 			Result := as_gmp_integer
+		ensure
+			to_gmp_integer_attached: Result /= Void
 		end
 
 	to_natural_32: NATURAL_32
