@@ -32,6 +32,7 @@ feature -- Access
 	item alias "[]" (a_index: GMP_INTEGER): G
 			-- Value associated with `a_index'
 		require
+			a_index_attached: a_index /= Void
 			a_index_valid: valid_index (a_index)
 		deferred
 		end
@@ -65,6 +66,8 @@ feature -- Status report
 	valid_index (a_index: GMP_INTEGER): BOOLEAN
 			-- Is `a_index' valid for direct access?
 			-- I.e. may we call `item [a_index]'?
+		require
+			a_index_attached: a_index /= Void
 		do
 			if attached lower_bound as l_lower then
 				Result := a_index >= l_lower
@@ -77,6 +80,8 @@ feature -- Status report
 
 	valid_iteration_start (a_start_position: GMP_INTEGER): BOOLEAN
 			-- Is `a_start_position' valid for use as the starting position when calling `at' etc. ?
+		require
+			a_start_position_attached: a_start_position /= Void
 		do
 			Result := valid_index (a_start_position)
 		ensure
@@ -101,6 +106,7 @@ feature -- Iteration
 	at (a_start_position: GMP_INTEGER; a_descending: BOOLEAN): INFINITE_SEQUENCE_ITERATOR [G]
 			-- New iterator pointing to `a_start_position'
 		require
+			a_start_position_attached: a_start_position /= Void
 			a_start_position_valid: valid_iteration_start (a_start_position)
 			a_descending_supported: valid_direction (a_descending)
 		deferred
@@ -112,6 +118,7 @@ feature -- Iteration
 	ascending_from (a_start_position: GMP_INTEGER): like at
 			-- New ascending iterator pointing to `a_start_position'
 		require
+			a_start_position_attached: a_start_position /= Void
 			a_start_position_valid: valid_iteration_start (a_start_position)
 			a_descending_supported: valid_direction (False)
 			no_upper_bound: not attached upper_bound
@@ -124,6 +131,7 @@ feature -- Iteration
 	descending_from (a_start_position: GMP_INTEGER): like at
 			-- New descending iterator pointing to `a_start_position'
 		require
+			a_start_position_attached: a_start_position /= Void
 			a_start_position_valid: valid_iteration_start (a_start_position)
 			a_descending_supported: valid_direction (True)
 			no_lower_bound: not attached lower_bound

@@ -26,4 +26,6 @@ feature -- Classes under test
 
 	gmp_float: detachable GMP_FLOAT
 
+	fibs: FIBONACCI_ITERATOR
+
 end
