@@ -34,7 +34,7 @@ feature -- Access
 			-- Value associated with `a_index';
 			-- Efficient only when `a_index.fits_natural_32' holds.
 			-- Otherwise we have to enumerate all the numbers from 
-			-- {INTEGER_32}.Max_value
+			-- {NATURAL_32}.Max_value
 		local
 			l_start_index: GMP_INTEGER
 			l_cursor: like at
@@ -43,7 +43,7 @@ feature -- Access
 				create Result
 				{MPZ_FUNCTIONS}.mpz_fib_ui (Result.item, a_index.to_natural_32)
 			else
-				create l_start_index.make_integer_32 ((0).Max_value)
+				create l_start_index.make_natural_32 (({NATURAL_32} 0).Max_value)
 				l_cursor := at (l_start_index, False)
 				from
 				until
