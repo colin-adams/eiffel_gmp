@@ -79,8 +79,6 @@ feature {NONE} -- Initialization
 	make_integer_32_with_precision (v: INTEGER_32; prec: NATURAL_32)
 			-- Initialize from `v'.
 			-- `precision' will be >= `prec'.
-		require
-			v_attached: v /= Void
 		do
 			make_precision (prec)
 			set_integer_32 (v)

@@ -307,8 +307,6 @@ feature -- Setting
 
 	set_integer (v: INTEGER_32)
 			-- Set `Current' to `v'/1.
-		require
-			v_attached: v /= Void
 		do
 			{MPQ_FUNCTIONS}.mpq_set_si (item, v, {NATURAL_32} 1)
 			-- {MPQ_FUNCTIONS}.mpq_canonicalize (item) -- hm. this should be unnecessary - comment out when test suite available.
