@@ -1,14 +1,14 @@
 note
 
 	description: "[
-		Iterators across the Fibonacci sequence
+		Iterators across the Lucas sequence
 	]"
 
 	author: "Colin Adams"
 	date: "$Date$"
 	revision: "$Revision$"
 
-class FIBONACCI_ITERATOR
+class LUCAS_ITERATOR
 
 inherit
 	
@@ -33,11 +33,13 @@ feature {NONE} -- Initialization
 			create item
 			create previous
 			if starting_position ~ starting_position.zero then
-				previous.set_integer_32 (1)
+				previous.set_integer_32 (0)
+				item.set_integer_32 (2)
 			elseif starting_position ~ starting_position.one then
 				item.set_integer_32 (1)
+				previous.set_integer_32 (2)
 			else
-				{MPZ_FUNCTIONS}.mpz_fib2_ui (item.item, previous.item, index.to_natural_32)
+				{MPZ_FUNCTIONS}.mpz_lucnum2_ui (item.item, previous.item, index.to_natural_32)
 			end
 			forth
 		ensure
@@ -48,7 +50,7 @@ feature {NONE} -- Initialization
 
 feature -- Access
 
-	target: GMP_FIBONACCI
+	target: GMP_LUCAS
 			-- <Precursor>
 
 	item: GMP_INTEGER
