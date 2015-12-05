@@ -76,11 +76,13 @@ feature {NONE} -- Initialization
 			set_integer_32 (v)
 		end
 
-	make_integer_32_with_precision (v: INTEGER_32; prec: NATURAL_32)
+	make_integer_32_with_precision (v: INTEGER_32; a_prec: NATURAL_32)
 			-- Initialize from `v'.
-			-- `precision' will be >= `prec'.
+			-- `precision' will be >= `a_prec'.
+		require
+			a_prec_not_too_large: a_prec < ({NATURAL_32}.Max_value - 64)
 		do
-			make_precision (prec)
+			make_precision (a_prec)
 			set_integer_32 (v)
 		end
 
@@ -94,13 +96,14 @@ feature {NONE} -- Initialization
 			set_gmp_rational (v)
 		end
 
-	make_gmp_rational_with_precision (v: GMP_RATIONAL; prec: NATURAL_32)
+	make_gmp_rational_with_precision (v: GMP_RATIONAL; a_prec: NATURAL_32)
 			-- Initialize from `v'.
 			-- `precision' will be >= `prec'.
 		require
 			v_attached: v /= Void
+			a_prec_not_too_large: a_prec < ({NATURAL_32}.Max_value - 64)			
 		do
-			make_precision (prec)
+			make_precision (a_prec)
 			{MPF_FUNCTIONS}.mpf_set_q (item, v.item)
 		end
 
@@ -114,13 +117,14 @@ feature {NONE} -- Initialization
 			set_gmp_integer (v)
 		end
 
-	make_gmp_integer_with_precision (v: GMP_INTEGER; prec: NATURAL_32)
+	make_gmp_integer_with_precision (v: GMP_INTEGER; a_prec: NATURAL_32)
 			-- Initialize from `v'.
-			-- `precision' will be >= `prec'.
+			-- `precision' will be >= `a_prec'.
 		require
 			v_attached: v /= Void
+			a_prec_not_too_large: a_prec < ({NATURAL_32}.Max_value - 64)
 		do
-			make_precision (prec)
+			make_precision (a_prec)
 			{MPF_FUNCTIONS}.mpf_set_z (item, v.item)
 		end
 
@@ -132,11 +136,13 @@ feature {NONE} -- Initialization
 			set_natural_32 (v)
 		end
 
-	make_natural_32_with_precision (v: NATURAL_32; prec: NATURAL_32)
+	make_natural_32_with_precision (v: NATURAL_32; a_prec: NATURAL_32)
 			-- Initialize from `v'.
 			-- `precision' will be >= `prec'.
+		require
+			a_prec_not_too_large: a_prec < ({NATURAL_32}.Max_value - 64)	
 		do
-			make_precision (prec)
+			make_precision (a_prec)
 			set_natural_32 (v)
 		end
 
@@ -148,11 +154,13 @@ feature {NONE} -- Initialization
 			set_real_64 (v)
 		end
 
-	make_real_64_with_precision (v: REAL_64; prec: NATURAL_32)
+	make_real_64_with_precision (v: REAL_64; a_prec: NATURAL_32)
 			-- Initialize from `v'.
-			-- `precision' will be >= `prec'.
+			-- `precision' will be >= `a_prec'.
+		require
+			a_prec_not_too_large: a_prec < ({NATURAL_32}.Max_value - 64)
 		do
-			make_precision (prec)
+			make_precision (a_prec)
 			{MPF_FUNCTIONS}.mpf_set_d (item, v)
 		end
 
@@ -172,16 +180,16 @@ feature {NONE} -- Initialization
 			set_string_successful: (not is_zero) implies set_string_successful
 		end
 
-	make_string_with_precision (v: STRING; prec: NATURAL_32)
+	make_string_with_precision (v: STRING; a_prec: NATURAL_32)
 			-- Initialize from `v'.
-			-- `precision' will be >= `prec'.
+			-- `precision' will be >= `a_prec'.
 		require
 			v_attached: v /= Void
 			v_is_decimal: is_decimal_string (v)
 		local
 			str: STRING
 		do
-			make_precision (prec)
+			make_precision (a_prec)
 			str := v.twin
 			str.prune_all_leading ('0')
 			if str.has ('.') then
@@ -281,6 +289,7 @@ feature -- Status report
 		local
 			i, l_count: INTEGER
 			l_str: STRING
+			l_point_seen: BOOLEAN
 		do
 			if not v.is_empty then
 				if v.item (1) = '-' or else v.item (1) = '+' then
@@ -295,7 +304,10 @@ feature -- Status report
 				until
 					(not Result) or else (i > l_count)
 				loop
-					Result := l_str.item (i).is_digit or l_str.item (i) ~ '.'
+					Result := l_str.item (i).is_digit or (l_str.item (i) ~ '.' and not l_point_seen)
+					if l_str.item (i)  ~ '.' then
+						l_point_seen := True
+					end
 					i := i + 1
 				end
 			end
@@ -386,6 +398,8 @@ feature -- Element change
 			-- Set `precision' to `a_prec'.
 			-- If `a_prec' < `precision' then the value of `Current'
 			-- will be truncated in accordance with the new `precision'.
+		require
+			a_prec_not_too_large: a_prec < ({NATURAL_32}.Max_value - 64)
 		do
 			{MPF_FUNCTIONS}.mpf_set_prec (item, a_prec)
 		end

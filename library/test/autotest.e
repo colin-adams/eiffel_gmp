@@ -15,7 +15,6 @@ feature {NONE} -- Initialization
 	make
 			-- Initialization for `Current'.
 		do
-			-- nothing to do
 		end
 
 feature -- Classes under test
@@ -31,5 +30,7 @@ feature -- Classes under test
 	integer_maths: GMP_INTEGER_MATH
 
 	rational_maths: GMP_RATIONAL_MATH
-	
+
+	floating_math: GMP_FLOAT_MATH
+
 end
