@@ -28,4 +28,6 @@ feature -- Classes under test
 
 	fibs: FIBONACCI_ITERATOR
 
+	integer_maths: GMP_INTEGER_MATH
+
 end

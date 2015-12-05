@@ -13,7 +13,11 @@ I have made the following changes to the code Chris uploaded to EiffelRoom in 20
 6) Removed convert clause from core classes.
 7) Added library.ecf file (works for linux - will need to be modified for other OSs - please send pull request)
 
-The core classes are GMP_INTEGER, GMP_RATIONAL and GMP_FLOAT. Some additional classes from support may move to the core later.
+Classes intended to be used by clients of the library are named GMP_* (this might not apply to classes in the constant cluster)
+Some (eventually all) such classes will be moved into the core cluster. These classes have all been updated w.r.t. standard naming conventions.
+Have contracts for non-void-safe mode. And have been extensively tested via generated Autotests.
+
+The principal core classes are GMP_INTEGER, GMP_RATIONAL and GMP_FLOAT.
 Classes like MPZ_FUNCTIONS will NOT be renamed.
 
 The thinking behind this naming scheme is that we use eiffel-style naming for classes and routines that users of the library will use.
