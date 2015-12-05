@@ -30,4 +30,6 @@ feature -- Classes under test
 
 	integer_maths: GMP_INTEGER_MATH
 
+	rational_maths: GMP_RATIONAL_MATH
+	
 end
