@@ -1,0 +1,21 @@
+package gmp
+
+project
+
+	gmp = "library/src/library.ecf"
+	gmp_non_safe = "library/src/non-safe.ecf"
+	gmp_tests = "library/test/test.ecf"
+
+note
+
+	title:	Eiffel GMP
+
+	description: "Eiffel wrapper to the GNU Multi-Precision arithmetic library"
+
+	tags:	     	     numeric, structure, maths
+	license:     	     LGPL v3 (see http://www.gnu.org/licenses/lgpl-3.0.en.html)
+	copyright:   	     2015 Colin Adams and others
+	link[doc]:   	     "Documentation" https://github.com/colin-adams/eiffel_gmp
+	link[source]:	     "Documentation" https://github.com/colin-adams/eiffel_gmp
+
+end
