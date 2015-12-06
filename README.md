@@ -22,3 +22,6 @@ Classes like MPZ_FUNCTIONS will NOT be renamed.
 
 The thinking behind this naming scheme is that we use eiffel-style naming for classes and routines that users of the library will use.
 Also the link to the GMP routines is still clear, so you can check the GMP documentation if you need to.
+
+ECFs should work out of the box for Linux, and most other UNIX style systems, assuming gmp.h is installed on the system. Otherwise you will
+need to install the relevant packages (gmp-devel on Fedora). For Windows, you will additionally need to change the linking flag, I think.

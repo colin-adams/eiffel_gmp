@@ -93,7 +93,7 @@ feature -- Iteration
 			-- New descending iterator pointing to `a_start_position'
 		do
 			-- precondition is never met.
-			-- to satsify void-safety compiler:
+			-- to satisfy void-safety compiler:
 			Result := ascending_from (a_start_position)
 		end
 	

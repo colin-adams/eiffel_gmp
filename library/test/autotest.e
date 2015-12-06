@@ -29,6 +29,8 @@ feature -- Classes under test
 
 	lucas: LUCAS_ITERATOR
 
+	fac: FACTORIAL_ITERATOR
+
 	integer_maths: GMP_INTEGER_MATH
 
 	rational_maths: GMP_RATIONAL_MATH

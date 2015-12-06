@@ -24,6 +24,7 @@ feature {NONE} -- Initialization
 			-- Set `target' and `index'.
 		require
 			a_target_attached: attached a_target
+			a_starting_position_attached: attached a_starting_position
 			a_starting_position_small_enough: a_starting_position.fits_natural_32
 		do
 			target := a_target
@@ -79,7 +80,8 @@ feature {NONE} -- Implementation
 			-- Has `forth' been called yet?
 
 	previous: GMP_INTEGER
-			-- F(N-1)
+			-- L(N-1)
+	
 end
 
 
