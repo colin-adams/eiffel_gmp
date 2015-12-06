@@ -11,7 +11,7 @@ note
 class LUCAS_ITERATOR
 
 inherit
-	
+
 	INFINITE_SEQUENCE_ITERATOR [GMP_INTEGER]
 
 create
@@ -33,7 +33,7 @@ feature {NONE} -- Initialization
 			create item
 			create previous
 			if starting_position ~ starting_position.zero then
-				previous.set_integer_32 (0)
+				previous.set_integer_32 (-1)
 				item.set_integer_32 (2)
 			elseif starting_position ~ starting_position.one then
 				item.set_integer_32 (1)
@@ -66,7 +66,7 @@ feature -- Cursor movement
 			if before then
 				before := False
 			else
-				index := index + one				
+				index := index + one
 				l_item := item
 				item := item + previous
 				previous := l_item
