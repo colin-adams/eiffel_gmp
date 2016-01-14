@@ -7,7 +7,7 @@
 		</option>
 		<setting name="console_application" value="true"/>
 		<external_linker_flag value="-lgmp"/>
-		<library name="base" location="$ISE_LIBRARY\library\base\base-safe.ecf"/>
+		<library name="base" location="iron:base:base.ecf"/>
 		<cluster name="gmp" location=".\" recursive="true">
 			<file_rule>
 				<exclude>/EIFGENs$</exclude>
