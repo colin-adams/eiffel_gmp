@@ -43,7 +43,8 @@ feature -- Access
 				create Result
 				{MPZ_FUNCTIONS}.mpz_fac_ui (Result.item, a_index.to_natural_32)
 			else
-					l_cursor := at (l_start_index, False)
+				create l_start_index.make_natural_32 ({NATURAL_32}.Max_value)
+				l_cursor := at (l_start_index, False)
 				from
 				until
 					l_cursor.index ~ a_index
