@@ -15,8 +15,9 @@ note
 	tags:	     	     numeric, structure, maths
 	license:     	     LGPL v3 (see http://www.gnu.org/licenses/lgpl-3.0.en.html)
 	copyright:   	     2016 Colin Adams and others
+	platforms:   	     linux
 	link[doc]:   	     "Documentation" https://github.com/colin-adams/eiffel_gmp
-	link[source]:	     "Documentation" https://github.com/colin-adams/eiffel_gmp
+	link[source]:	     "github" https://github.com/colin-adams/eiffel_gmp
 	see_also:            README.md
 
 end
